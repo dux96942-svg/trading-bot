@@ -1,21 +1,25 @@
 import requests
-import time
 
-# Il tuo Token Telegram ufficiale
+# Token ufficiale del bot Telegram
 TOKEN = "9188238206:AAHIks7soHy3EJqQ6g3QWaptd6X--sSV_ws"
-CHAT_ID = None  # Si collegherà automaticamente al primo che scrive al bot
+# Il tuo ID Telegram personale
+CHAT_ID = "570662446"
 
-def get_updates():
-    url = f"https://api.telegram.org/bot{TOKEN}/getUpdates"
-    try:
-        response = requests.get(url)
-        return response.json()
-    except:
-        return None
-
-def send_message(chat_id, text):
+def send_message(text):
     url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-    payload = {"chat_id": chat_id, "text": text, "parse_mode": "Markdown"}
-    requests.post(url, json=payload)
+    payload = {
+        "chat_id": CHAT_ID,
+        "text": text,
+        "parse_mode": "Markdown"
+    }
+    response = requests.post(url, json=payload)
+    return response.json()
 
-print("Bot avviato e in attesa di connessione...")
+if __name__ == "__main__":
+    messaggio = (
+        "🤖 *Bot Trading Exchange Avviato!*\n\n"
+        "Ciao Francesco! Il collegamento è riuscito alla perfezione. "
+        "Da questo momento il bot è pronto per inviarti le 3 migliori partite del giorno."
+    )
+    risultato = send_message(messaggio)
+    print("Risultato invio:", risultato)
