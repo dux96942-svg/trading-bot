@@ -1,0 +1,25 @@
+name: Bot Trading Exchange
+
+on:
+  schedule:
+    # Si avvia ogni giorno alle 09:00 (ora italiana)
+    - cron: '0 8 * * *'
+  workflow_dispatch: # Ti permette anche di avviarlo a mano quando vuoi
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout codice
+        uses: actions/checkout@v3
+
+      - name: Configura Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Installa pacchetti
+        run: pip install requests
+
+      - name: Esegui Bot
+        run: python bot.py
