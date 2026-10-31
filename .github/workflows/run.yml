@@ -1,51 +1,30 @@
-import os
-import requests
-from datetime import datetime
+name: Bot Trading Exchange
 
-TOKEN = os.getenv("TELEGRAM_TOKEN", "9188238206:AAHIks7soHy3EJqQ6g3QWaptd6X--sSV_ws")
-CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "570662446")
+on:
+  schedule:
+    # Esegue il bot ogni giorno alle 06:30 UTC (corrispondenti alle 08:30 in Italia)
+    - cron: '30 6 * * *'
+  workflow_dispatch: # Mantiene attivo anche il pulsante per il test manuale
 
-def send_message(text):
-    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-    payload = {
-        "chat_id": CHAT_ID,
-        "text": text,
-        "parse_mode": "Markdown"
-    }
-    response = requests.post(url, json=payload)
-    return response.json()
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-def ottieni_partite_giornaliere():
-    """
-    Recupera e filtra le partite del giorno in base ai criteri Exchange:
-    - Esclusione amichevoli e giovanili
-    - Filtro quota Over 2.5 <= 1.60
-    - Ordinamento per liquidità reale
-    """
-    oggi_str = datetime.now().strftime("%d/%m/%Y")
-    
-    # Lista elaborata dei match validi per il palinsesto odierno
-    partite_filtrate = [
-        {"squadre": "Atalanta vs Lazio", "quota": 1.53, "liquidita": "€ 64.200"},
-        {"squadre": "Bologna vs Roma", "quota": 1.57, "liquidita": "€ 52.800"},
-        {"squadre": "Fiorentina vs Torino", "quota": 1.49, "liquidita": "€ 45.100"}
-    ]
-    
-    return partite_filtrate
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
 
-if __name__ == "__main__":
-    oggi = datetime.now().strftime("%d/%m/%Y")
-    partite = ottieni_partite_giornaliere()
-    
-    # Costruzione del report strutturato
-    testo = f"📊 *Report Trading Exchange - {oggi}*\n\n"
-    testo += "🎯 *Filtri attivi:* Exchange | Over 2.5 ≤ 1.60 (No Amichevoli/Giovanili)\n"
-    testo += "🏆 *Top 3 partite per liquidità reale:*\n\n"
-    
-    for i, p in enumerate(partite, 1):
-        testo += f"{i}️⃣ *{p['squadre']}*\n"
-        testo += f"   • Quota Over 2.5: `{p['quota']}`\n"
-        testo += f"   • Liquidità Exchange: `{p['liquidita']}`\n\n"
-        
-    risultato = send_message(testo)
-    print("Risultato invio:", risultato)
+      - name: Install dependencies
+        run: |
+          pip install requests
+
+      - name: Run bot script
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python bot.py
