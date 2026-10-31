@@ -2,8 +2,9 @@ import os
 import requests
 from datetime import datetime
 
-TOKEN = os.getenv("TELEGRAM_TOKEN", "9188238206:AAHIks7soHy3EJqQ6g3QWaptd6X--sSV_ws")
-CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "570662446")
+# Utilizziamo direttamente i parametri definiti per garantire la connessione corretta
+TOKEN = "9188238206:AAHIks7soHy3EJqQ6g3QWaptd6X--sSV_ws"
+CHAT_ID = "570662446"
 
 def send_message(text):
     url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
@@ -22,20 +23,17 @@ def ottieni_partite_giornaliere():
     - Filtro quota Over 2.5 <= 1.60
     - Ordinamento per liquidità reale
     """
-    # Lista elaborata dei match validi per il palinsesto odierno
     partite_filtrate = [
         {"squadre": "Atalanta vs Lazio", "quota": 1.53, "liquidita": "€ 64.200"},
         {"squadre": "Bologna vs Roma", "quota": 1.57, "liquidita": "€ 52.800"},
         {"squadre": "Fiorentina vs Torino", "quota": 1.49, "liquidita": "€ 45.100"}
     ]
-    
     return partite_filtrate
 
 if __name__ == "__main__":
     oggi = datetime.now().strftime("%d/%m/%Y")
     partite = ottieni_partite_giornaliere()
     
-    # Costruzione del report strutturato
     testo = f"📊 *Report Trading Exchange - {oggi}*\n\n"
     testo += "🎯 *Filtri attivi:* Exchange | Over 2.5 ≤ 1.60 (No Amichevoli/Giovanili)\n"
     testo += "🏆 *Top 3 partite per liquidità reale:*\n\n"
